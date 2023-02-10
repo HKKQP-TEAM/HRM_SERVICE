@@ -11,8 +11,8 @@ export function authorizationChecker(action: Action, roles: Array<UserRole>) {
     const authorization = action.request.headers.authorization;
     const token = authorization.replace(/^Bearer\s+/, '');
     const user = DI.instance.jwtService.verify<JwtPayload>(token);
+
     logger.info(user);
-    logger.info(roles);
 
     if (roles.length === 0) {
       return true;
