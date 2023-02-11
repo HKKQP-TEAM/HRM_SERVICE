@@ -3,11 +3,12 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { StatusCodes } from 'http-status-codes';
 
-import { ErrorCode, UserRole } from '../../enums';
+import { ErrorCode } from '../../enums';
 import { AppError } from '../../errors';
 import { DI } from '../../providers';
-import { excludeFields, logger, randomStringGenerator } from '../../utils';
+import { excludeFields, randomStringGenerator } from '../../utils';
 import type { JwtService } from '../jwt';
+import { Role } from '../role';
 import type { UserService } from '../user';
 import { AuthProviders } from './auth-providers.enum';
 import type { AuthEmailLoginDto, AuthRegisterDto } from './dto';
@@ -25,14 +26,9 @@ export class AuthService {
   async validateLogin(loginDto: AuthEmailLoginDto, onlyAdmin: boolean) {
     const user = await this.userService.findByEmail(loginDto.email);
 
-    logger.info(user);
-
     if (
       !user ||
-      (user &&
-        !(
-          onlyAdmin ? [UserRole.SuperAdmin, UserRole.Admin] : [UserRole.User]
-        ).includes(UserRole[user.role]))
+      (user && !(onlyAdmin ? [Role.Admin] : [Role.User]).includes(user.roleId))
     ) {
       throw new AppError(StatusCodes.NOT_FOUND, [
         {
@@ -70,7 +66,7 @@ export class AuthService {
 
     const token = this.jwtService.sign({
       id: user.id,
-      role: user.role,
+      roleId: user.roleId,
     });
 
     const userExcludedFields = excludeFields<User, keyof User>(user, [
@@ -91,12 +87,5 @@ export class AuthService {
       ...dto,
       hash,
     });
-
-    // await this.mailService.userSignUp({
-    //   to: user.email,
-    //   data: {
-    //     hash,
-    //   },
-    // });
   }
 }

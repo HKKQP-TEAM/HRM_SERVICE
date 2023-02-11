@@ -33,10 +33,14 @@ export class UserService {
     });
   }
 
-  async findById(id: string) {
+  async findById(id: number) {
     try {
-      const user = await this.prisma.user.findUnique({
+      const user = await this.prisma.user.findFirst({
         where: { id },
+        include: {
+          role: true,
+          status: true,
+        },
       });
 
       return excludeFields<User, keyof User>(user!, ['password', 'hash']);
@@ -46,16 +50,23 @@ export class UserService {
   }
 
   async findByEmail(email: string) {
-    return await this.prisma.user.findUnique({
+    return await this.prisma.user.findFirst({
       where: { email },
+      include: {
+        role: true,
+        status: true,
+      },
     });
   }
 
-  update(id: string, updateProfileDto: UpdateUserDto) {
-    return this.prisma.user.update({ where: { id }, data: updateProfileDto });
+  update(id: number, updateProfileDto: UpdateUserDto) {
+    return this.prisma.user.update({
+      where: { id },
+      data: updateProfileDto,
+    });
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(id: number): Promise<void> {
     await this.prisma.user.delete({ where: { id } });
   }
 }

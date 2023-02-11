@@ -13,14 +13,14 @@ import {
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 
-import { UserRole } from '../../enums';
 import { DI } from '../../providers';
 import { infinityPagination } from '../../utils';
+import { Role } from '../role';
 import { CreateUserDto, UpdateUserDto } from './dto';
 import type { UserService } from './user.service';
 
 @JsonController('/users/')
-@Authorized([UserRole.SuperAdmin, UserRole.Admin])
+@Authorized([Role.Admin])
 @OpenAPI({ security: [{ basicAuth: [] }] })
 export class UserController {
   private userService: UserService;
@@ -56,18 +56,18 @@ export class UserController {
 
   @Get(':id')
   @HttpCode(StatusCodes.OK)
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: number) {
     return this.userService.findById(id);
   }
 
   @Patch(':id')
   @HttpCode(StatusCodes.OK)
-  update(@Param('id') id: string, @Body() updateProfileDto: UpdateUserDto) {
+  update(@Param('id') id: number, @Body() updateProfileDto: UpdateUserDto) {
     return this.userService.update(id, updateProfileDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: number) {
     return this.userService.delete(id);
   }
 }

@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client';
 
 import { AuthService } from '../modules/auth/auth.service';
 import { JwtService } from '../modules/jwt';
+import { RoleService } from '../modules/role';
 import { UserService } from '../modules/user';
 import { ConfigService } from './config.service';
 
@@ -38,5 +39,9 @@ export class DI {
 
   get prismaService(): PrismaClient {
     return new PrismaClient();
+  }
+
+  get roleService(): RoleService {
+    return new RoleService();
   }
 }

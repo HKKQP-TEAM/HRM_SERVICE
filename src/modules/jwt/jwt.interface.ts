@@ -24,7 +24,7 @@ export interface JwtVerifyOptions extends VerifyOptions {
   publicKey?: string | Buffer;
 }
 
-export type JwtPayload = Pick<User, 'id' | 'role'> & {
+export type JwtPayload = Pick<User, 'id' | 'roleId'> & {
   iat: number;
   exp: number;
 };

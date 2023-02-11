@@ -6,9 +6,6 @@ import {
   IsString,
   MinLength,
 } from 'class-validator';
-
-import { UserStatus } from '../../../enums';
-
 export class UpdateUserDto {
   @Transform(({ value }) => value?.toLowerCase().trim())
   @IsNotEmpty()
@@ -24,10 +21,6 @@ export class UpdateUserDto {
   @MinLength(6)
   @IsOptional()
   password?: string;
-
-  @IsNotEmpty()
-  @IsOptional()
-  status?: UserStatus;
 
   @IsNotEmpty()
   @IsOptional()
