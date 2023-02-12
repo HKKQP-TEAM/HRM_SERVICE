@@ -1,6 +1,6 @@
 import type { PrismaClient } from '@prisma/client';
 
-import { DI } from '../../providers';
+import { DI } from '~/providers';
 
 export class RoleService {
   private prisma: PrismaClient;

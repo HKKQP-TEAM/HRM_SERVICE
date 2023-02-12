@@ -3,13 +3,14 @@ import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { StatusCodes } from 'http-status-codes';
 
-import { ErrorCode } from '../../enums';
-import { AppError } from '../../errors';
-import { DI } from '../../providers';
-import { excludeFields, randomStringGenerator } from '../../utils';
-import type { JwtService } from '../jwt';
-import { Role } from '../role';
-import type { UserService } from '../user';
+import { ErrorCode } from '~/enums';
+import { AppError } from '~/errors';
+import type { JwtService } from '~/modules/jwt';
+import { Role } from '~/modules/role';
+import type { UserService } from '~/modules/user';
+import { DI } from '~/providers';
+import { excludeFields, randomStringGenerator } from '~/utils';
+
 import { AuthProviders } from './auth-providers.enum';
 import type { AuthEmailLoginDto, AuthRegisterDto } from './dto';
 

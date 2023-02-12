@@ -2,7 +2,8 @@ import { StatusCodes } from 'http-status-codes';
 import { Authorized, Get, HttpCode, JsonController } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 
-import { DI } from '../../providers';
+import { DI } from '~/providers';
+
 import { Role } from './role.enum';
 import type { RoleService } from './role.service';
 

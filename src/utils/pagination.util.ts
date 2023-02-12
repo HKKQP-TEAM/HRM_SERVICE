@@ -1,4 +1,4 @@
-import type { PaginationOptions } from '../types';
+import type { PaginationOptions } from '~/types';
 
 export const infinityPagination = <T>(
   data: Array<T>,
