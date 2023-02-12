@@ -27,6 +27,9 @@ export class DI {
   get jwtService(): JwtService {
     return new JwtService({
       secret: this.configService.get<string>('AUTH_JWT_SECRET'),
+      signOptions: {
+        expiresIn: this.configService.get<string>('AUTH_JWT_TOKEN_EXPIRES_IN'),
+      },
     });
   }
 
