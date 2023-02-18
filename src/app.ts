@@ -23,6 +23,9 @@ export class App {
         `Listening on http://[::1]:${this.configService.get('PORT')}`,
         { prefix: 'Express' },
       );
+      logger.info(`http://[::1]:${this.configService.get('PORT')}/v1/docs`, {
+        prefix: 'API Docs',
+      });
     });
   }
 
