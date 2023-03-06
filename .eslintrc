@@ -234,7 +234,6 @@
     "constructor-super": "error",
     "yoda": "error",
     "strict": ["error", "never"],
-    "curly": "error",
     "dot-notation": "error",
     "eol-last": "error",
     "eqeqeq": ["error", "smart"],

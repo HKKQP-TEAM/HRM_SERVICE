@@ -1,20 +1,21 @@
 import type { PrismaClient, User } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
 import * as crypto from 'crypto';
 import { StatusCodes } from 'http-status-codes';
 
+import { BcryptHelper } from '~/core';
 import { ErrorCode } from '~/enums';
-import { AppError } from '~/errors';
+import { HttpException } from '~/exceptions';
 import type { JwtService } from '~/modules/jwt';
 import { Role } from '~/modules/role';
 import type { UserService } from '~/modules/user';
 import { DI } from '~/providers';
 import { excludeFields, randomStringGenerator } from '~/utils';
 
+import type { AuthService } from './auth.interface';
 import { AuthProviders } from './auth-providers.enum';
 import type { AuthEmailLoginDto, AuthRegisterDto } from './dto';
 
-export class AuthService {
+export class AuthServiceIml implements AuthService {
   private prisma: PrismaClient;
 
   constructor(
@@ -31,7 +32,7 @@ export class AuthService {
       !user ||
       (user && !(onlyAdmin ? [Role.Admin] : [Role.User]).includes(user.roleId))
     ) {
-      throw new AppError(StatusCodes.NOT_FOUND, [
+      throw new HttpException(StatusCodes.NOT_FOUND, [
         {
           key: 'user',
           message: `User Not Found`,
@@ -41,7 +42,7 @@ export class AuthService {
     }
 
     if (user.provider !== AuthProviders.Email) {
-      throw new AppError(StatusCodes.BAD_REQUEST, [
+      throw new HttpException(StatusCodes.BAD_REQUEST, [
         {
           key: 'sign-in provider',
           message: `Need sign-in via ${user.provider} provider`,
@@ -50,13 +51,13 @@ export class AuthService {
       ]);
     }
 
-    const isValidPassword = await bcrypt.compare(
+    const isValidPassword = await BcryptHelper.verifyHash(
       loginDto.password,
       user.password,
     );
 
     if (!isValidPassword) {
-      throw new AppError(StatusCodes.BAD_REQUEST, [
+      throw new HttpException(StatusCodes.BAD_REQUEST, [
         {
           key: 'password',
           message: `Incorrect Password`,

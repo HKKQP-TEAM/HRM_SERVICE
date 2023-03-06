@@ -90,7 +90,7 @@
     "src/**/*.{ts, tsx}": [
       "eslint --fix",
       "prettier --write",
-      "git add"
+      "git add ."
     ]
   },
   "prisma": {
