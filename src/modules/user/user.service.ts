@@ -1,48 +1,44 @@
-import type { PrismaClient, User } from '@prisma/client';
+import type { User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
+import { StatusCodes } from 'http-status-codes';
 import { NotFoundError } from 'routing-controllers';
 
+import { ErrorCode } from '~/enums';
+import { HttpException } from '~/exceptions';
 import { DI } from '~/providers';
 import type { PaginationOptions } from '~/types';
 import { excludeFields } from '~/utils';
 
 import type { CreateUserDto, UpdateUserDto } from './dto';
+import type { UserRepository, UserService } from './user.interface';
 
-export class UserService {
-  private prisma: PrismaClient;
+export class UserServiceImpl implements UserService {
+  private userRepository: UserRepository;
 
   constructor() {
-    this.prisma = DI.instance.prismaService;
+    this.userRepository = DI.instance.userRepository;
   }
 
   async create(createProfileDto: CreateUserDto) {
     const salt = await bcrypt.genSalt();
     const hashedPassword = await bcrypt.hash(createProfileDto.password, salt);
 
-    return this.prisma.user.create({
-      data: {
-        ...createProfileDto,
-        password: hashedPassword,
-      },
+    return await this.userRepository.create({
+      ...createProfileDto,
+      password: hashedPassword,
     });
   }
 
   findManyWithPagination(paginationOptions: PaginationOptions) {
-    return this.prisma.user.findMany({
+    return this.userRepository.find({
       skip: (paginationOptions.page - 1) * paginationOptions.limit,
       take: paginationOptions.limit,
     });
   }
 
-  async findById(id: number) {
+  async findById(id: string) {
     try {
-      const user = await this.prisma.user.findFirst({
-        where: { id },
-        include: {
-          role: true,
-          status: true,
-        },
-      });
+      const user = await this.userRepository.findOneById(id);
 
       return excludeFields<User, keyof User>(user!, ['password', 'hash']);
     } catch {
@@ -50,24 +46,27 @@ export class UserService {
     }
   }
 
-  async findByEmail(email: string) {
-    return await this.prisma.user.findFirst({
-      where: { email },
-      include: {
-        role: true,
-        status: true,
-      },
-    });
+  async findByEmail(email: string): Promise<User | null> {
+    try {
+      const user = await this.userRepository.findOneBy({ email });
+
+      return user;
+    } catch {
+      throw new HttpException(StatusCodes.NOT_FOUND, [
+        {
+          code: ErrorCode.NotFound,
+          key: 'User',
+          message: `Not found user with ${email}`,
+        },
+      ]);
+    }
   }
 
-  update(id: number, updateProfileDto: UpdateUserDto) {
-    return this.prisma.user.update({
-      where: { id },
-      data: updateProfileDto,
-    });
+  update(id: string, updateProfileDto: UpdateUserDto) {
+    return this.userRepository.update(id, updateProfileDto);
   }
 
-  async delete(id: number): Promise<void> {
-    await this.prisma.user.delete({ where: { id } });
+  async delete(id: string): Promise<void> {
+    await this.userRepository.delete(id);
   }
 }

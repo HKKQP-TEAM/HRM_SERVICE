@@ -53,6 +53,8 @@ function createLogger(
   const clear = canClearScreen ? clearScreen : () => {};
 
   function output(type: LogType, msg: LogMessage, options?: LogOptions) {
+    if (process.env.NODE_ENV === 'production') return;
+
     const prefix = options?.prefix ? `[${options?.prefix}]` : '[ax]';
     const objString = JSON.stringify(msg);
 

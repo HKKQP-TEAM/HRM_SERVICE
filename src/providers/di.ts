@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client';
 
-import { AuthService } from '~/modules/auth/auth.service';
+import type { AuthService } from '~/modules/auth';
+import { AuthServiceIml } from '~/modules/auth';
 import { JwtService } from '~/modules/jwt';
 import { RoleService } from '~/modules/role';
-import { UserService } from '~/modules/user';
+import type { UserRepository, UserService } from '~/modules/user';
+import { UserRepositoryIml, UserServiceImpl } from '~/modules/user';
 
 import { ConfigService } from './config.service';
 
@@ -34,11 +36,11 @@ export class DI {
   }
 
   get userService(): UserService {
-    return new UserService();
+    return new UserServiceImpl();
   }
 
   get authService(): AuthService {
-    return new AuthService(this.userService, this.jwtService);
+    return new AuthServiceIml(this.userService, this.jwtService);
   }
 
   get prismaService(): PrismaClient {
@@ -47,5 +49,10 @@ export class DI {
 
   get roleService(): RoleService {
     return new RoleService();
+  }
+
+  //
+  get userRepository(): UserRepository {
+    return new UserRepositoryIml();
   }
 }
