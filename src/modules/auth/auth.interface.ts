@@ -1,5 +1,5 @@
 import type { UserEntity } from '../user/entities';
-import type { AuthEmailLoginDto, AuthRegisterDto } from './dto';
+import type { AuthEmailLoginDto } from './dto';
 
 export interface AuthService {
   validateLogin(
@@ -10,5 +10,5 @@ export interface AuthService {
     user: Omit<UserEntity, keyof UserEntity>;
   }>;
 
-  register(dto: AuthRegisterDto): Promise<UserEntity>;
+  // register(dto: AuthRegisterDto): Promise<UserEntity>;
 }

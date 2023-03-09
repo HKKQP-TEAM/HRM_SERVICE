@@ -1,5 +1,3 @@
-import type { User } from '@prisma/client';
-import * as bcrypt from 'bcrypt';
 import { StatusCodes } from 'http-status-codes';
 import { NotFoundError } from 'routing-controllers';
 
@@ -10,6 +8,7 @@ import type { PaginationOptions } from '~/types';
 import { excludeFields } from '~/utils';
 
 import type { CreateUserDto, UpdateUserDto } from './dto';
+import type { UserEntity } from './entities';
 import type { UserRepository, UserService } from './user.interface';
 
 export class UserServiceImpl implements UserService {
@@ -19,14 +18,8 @@ export class UserServiceImpl implements UserService {
     this.userRepository = DI.instance.userRepository;
   }
 
-  async create(createProfileDto: CreateUserDto) {
-    const salt = await bcrypt.genSalt();
-    const hashedPassword = await bcrypt.hash(createProfileDto.password, salt);
-
-    return await this.userRepository.create({
-      ...createProfileDto,
-      password: hashedPassword,
-    });
+  create(_createProfileDto: CreateUserDto) {
+    return this.userRepository.create({});
   }
 
   findManyWithPagination(paginationOptions: PaginationOptions) {
@@ -40,13 +33,13 @@ export class UserServiceImpl implements UserService {
     try {
       const user = await this.userRepository.findOneById(id);
 
-      return excludeFields<User, keyof User>(user!, ['password', 'hash']);
+      return excludeFields<UserEntity, keyof UserEntity>(user!, ['password']);
     } catch {
       throw new NotFoundError('not found');
     }
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findByEmail(email: string): Promise<UserEntity | null> {
     try {
       const user = await this.userRepository.findOneBy({ email });
 
