@@ -3,7 +3,6 @@ import { StatusCodes } from 'http-status-codes';
 import {
   Authorized,
   Body,
-  Delete,
   Get,
   HttpCode,
   JsonController,
@@ -14,12 +13,11 @@ import { OpenAPI } from 'routing-controllers-openapi';
 
 import { DI } from '~/providers/di';
 
-import type { AuthService } from './auth.service';
+import type { AuthService } from './auth.interface';
 import {
   AuthConfirmEmailDto,
   AuthEmailLoginDto,
   AuthForgotPasswordDto,
-  AuthRegisterDto,
   AuthResetPasswordDto,
   AuthUpdateDto,
 } from './dto';
@@ -41,25 +39,13 @@ export class AuthController {
     this.authService = DI.instance.authService;
   }
 
-  @Post('email/login')
+  @Post('login')
   @HttpCode(StatusCodes.OK)
   public login(@Body() loginDto: AuthEmailLoginDto) {
     return this.authService.validateLogin(loginDto, false);
   }
 
-  @Post('admin/email/login')
-  @HttpCode(StatusCodes.OK)
-  public adminLogin(@Body() loginDTO: AuthEmailLoginDto) {
-    return this.authService.validateLogin(loginDTO, true);
-  }
-
-  @Post('email/register')
-  @HttpCode(StatusCodes.CREATED)
-  register(@Body() createUserDto: AuthRegisterDto) {
-    return this.authService.register(createUserDto);
-  }
-
-  @Post('email/confirm')
+  @Post('confirm')
   @HttpCode(StatusCodes.OK)
   confirmEmail(@Body() _confirmEmailDto: AuthConfirmEmailDto) {
     // return this.authService.confirmEmail(confirmEmailDto.hash);
@@ -92,12 +78,5 @@ export class AuthController {
   @HttpCode(StatusCodes.OK)
   public update(@Body() _userDto: AuthUpdateDto) {
     // return this.authService.update(request.user, userDto);
-  }
-
-  @Authorized()
-  @Delete('me')
-  @HttpCode(StatusCodes.OK)
-  public delete() {
-    // return this.authService.softDelete(request.user);
   }
 }

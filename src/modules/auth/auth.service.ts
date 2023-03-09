@@ -1,93 +1,14 @@
-import type { PrismaClient, User } from '@prisma/client';
-import * as crypto from 'crypto';
-import { StatusCodes } from 'http-status-codes';
-
-import { BcryptHelper } from '~/core';
-import { ErrorCode } from '~/enums';
-import { HttpException } from '~/exceptions';
-import type { JwtService } from '~/modules/jwt';
-import { Role } from '~/modules/role';
 import type { UserService } from '~/modules/user';
-import { DI } from '~/providers';
-import { excludeFields, randomStringGenerator } from '~/utils';
 
 import type { AuthService } from './auth.interface';
-import { AuthProviders } from './auth-providers.enum';
-import type { AuthEmailLoginDto, AuthRegisterDto } from './dto';
+import type { AuthEmailLoginDto } from './dto';
 
 export class AuthServiceIml implements AuthService {
-  private prisma: PrismaClient;
+  constructor(private readonly userService: UserService) {}
 
-  constructor(
-    private readonly userService: UserService,
-    private readonly jwtService: JwtService,
-  ) {
-    this.prisma = DI.instance.prismaService;
-  }
+  async validateLogin(loginDto: AuthEmailLoginDto, _: boolean) {
+    await this.userService.findByEmail(loginDto.email);
 
-  async validateLogin(loginDto: AuthEmailLoginDto, onlyAdmin: boolean) {
-    const user = await this.userService.findByEmail(loginDto.email);
-
-    if (
-      !user ||
-      (user && !(onlyAdmin ? [Role.Admin] : [Role.User]).includes(user.roleId))
-    ) {
-      throw new HttpException(StatusCodes.NOT_FOUND, [
-        {
-          key: 'user',
-          message: `User Not Found`,
-          code: ErrorCode.NotFound,
-        },
-      ]);
-    }
-
-    if (user.provider !== AuthProviders.Email) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, [
-        {
-          key: 'sign-in provider',
-          message: `Need sign-in via ${user.provider} provider`,
-          code: ErrorCode.InvalidRequest,
-        },
-      ]);
-    }
-
-    const isValidPassword = await BcryptHelper.verifyHash(
-      loginDto.password,
-      user.password,
-    );
-
-    if (!isValidPassword) {
-      throw new HttpException(StatusCodes.BAD_REQUEST, [
-        {
-          key: 'password',
-          message: `Incorrect Password`,
-          code: ErrorCode.InvalidField,
-        },
-      ]);
-    }
-
-    const token = this.jwtService.sign({
-      id: user.id,
-      roleId: user.roleId,
-    });
-
-    const userExcludedFields = excludeFields<User, keyof User>(user, [
-      'password',
-      'hash',
-    ]);
-
-    return { token, user: userExcludedFields };
-  }
-
-  async register(dto: AuthRegisterDto): Promise<User> {
-    const hash = crypto
-      .createHash('sha256')
-      .update(randomStringGenerator())
-      .digest('hex');
-
-    return await this.userService.create({
-      ...dto,
-      hash,
-    });
+    return { token: '', user: 'userExcludedFields' };
   }
 }

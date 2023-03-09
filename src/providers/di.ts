@@ -3,7 +3,6 @@ import { PrismaClient } from '@prisma/client';
 import type { AuthService } from '~/modules/auth';
 import { AuthServiceIml } from '~/modules/auth';
 import { JwtService } from '~/modules/jwt';
-import { RoleService } from '~/modules/role';
 import type { UserRepository, UserService } from '~/modules/user';
 import { UserRepositoryIml, UserServiceImpl } from '~/modules/user';
 
@@ -40,18 +39,14 @@ export class DI {
   }
 
   get authService(): AuthService {
-    return new AuthServiceIml(this.userService, this.jwtService);
+    return new AuthServiceIml(this.userService);
   }
 
   get prismaService(): PrismaClient {
     return new PrismaClient();
   }
 
-  get roleService(): RoleService {
-    return new RoleService();
-  }
-
-  //
+  // -----------
   get userRepository(): UserRepository {
     return new UserRepositoryIml();
   }

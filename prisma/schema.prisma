@@ -10,28 +10,276 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Role {
-  id   Int    @id @default(autoincrement())
-  name String
-  User User[]
+model Company {
+  id           String   @id @default(uuid())
+  name         String
+  emailContact String   @unique
+  phoneNumber  String
+  logo         String?
+  slogan       String?
+  address      String
+  updatedAt    DateTime @default(now())
+  createdAt    DateTime @default(now())
+  createdBy    String
+  updatedBy    String
+
+  @@map(name: "company")
 }
 
-model UserStatus {
-  id   Int    @id @default(autoincrement())
-  name String
-  User User[]
+model Contact {
+  id                String    @id @default(uuid())
+  nativePlace       String
+  currentWhereabout String
+  phoneNumber       String
+  emailContact      String    @unique
+  updatedAt         DateTime  @default(now())
+  createdAt         DateTime  @default(now())
+  createdBy         String
+  updatedBy         String
+  employee          Employee?
+
+  @@map(name: "contact")
+}
+
+model Department {
+  id             String     @id @default(uuid())
+  departmentName String
+  description    String?
+  location       String?
+  updatedAt      DateTime   @default(now())
+  createdAt      DateTime   @default(now())
+  createdBy      String
+  updatedBy      String
+  employees      Employee[]
+
+  @@map(name: "department")
+}
+
+enum JobTypeStatus {
+  Full
+  Part
+}
+
+enum Gender {
+  Male
+  Female
+  Other
+}
+
+model Employee {
+  id            String        @id @default(uuid())
+  firstName     String
+  lastName      String
+  idNumber      String
+  title         String
+  job           JobTypeStatus
+  gender        Gender
+  birthDay      DateTime
+  roleId        String
+  role          Role          @relation(fields: [roleId], references: [id])
+  departmentId  String
+  department    Department    @relation(fields: [departmentId], references: [id])
+  contactId     String        @unique
+  contact       Contact       @relation(fields: [contactId], references: [id])
+  updatedAt     DateTime      @default(now())
+  createdAt     DateTime      @default(now())
+  createdBy     String
+  updatedBy     String
+  startAt       DateTime      @default(now())
+  endAt         DateTime?
+  salaries      Salary[]
+  totalSalaries TotalSalary[]
+  workingTime   WorkingTime[]
+  users         User[]
+  jobs          EmployeeJob[]
+
+  @@map(name: "employee")
+}
+
+enum EmployeeJobStatus {
+  Pending
+  Blocked
+  Accepeted
+}
+
+model EmployeeJob {
+  id         String            @unique @default(uuid())
+  jobId      String
+  jobJob     Job               @relation(fields: [jobId], references: [id])
+  employeeId String
+  employee   Employee          @relation(fields: [employeeId], references: [id])
+  status     EmployeeJobStatus
+  updatedAt  DateTime          @default(now())
+  createdAt  DateTime          @default(now())
+  createdBy  String
+  updatedBy  String
+  startAt    DateTime          @default(now())
+  endAt      DateTime?
+
+  @@id([jobId, employeeId])
+  @@map(name: "employee_job")
+}
+
+model Holiday {
+  id          String   @id @default(uuid())
+  eventName   String
+  description String?
+  updatedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  startAt     DateTime
+  endAt       DateTime
+  createdBy   String
+  updatedBy   String
+
+  @@map(name: "holiday")
+}
+
+enum JobStatus {
+  Pending
+  Blocked
+  Accepeted
+  Finished
+}
+
+enum JobCustom {
+  Basic
+  Custom
+}
+
+model Job {
+  id               String        @id @default(uuid())
+  name             String
+  requiement       String
+  numberOfEmployee Int
+  status           JobStatus
+  custom           JobCustom
+  salary           Decimal
+  updatedAt        DateTime      @default(now())
+  createdAt        DateTime      @default(now())
+  createdBy        String
+  updatedBy        String
+  startAt          DateTime      @default(now())
+  endAt            DateTime?
+  employees        EmployeeJob[]
+
+  @@map(name: "job")
+}
+
+model NotifyUser {
+  id        String   @unique @default(uuid())
+  uid       String
+  user      User     @relation(fields: [uid], references: [id])
+  notifyId  String
+  notify    Notify   @relation(fields: [notifyId], references: [id])
+  updatedAt DateTime @default(now())
+  createdAt DateTime @default(now())
+  createdBy String?
+  updatedBy String?
+
+  @@id([uid, notifyId])
+  @@map(name: "notify_user")
+}
+
+model Notify {
+  id          String       @id @default(uuid())
+  title       String?
+  content     String?
+  updatedAt   DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+  notifyUsers NotifyUser[]
+
+  @@map(name: "notify")
+}
+
+model Role {
+  id          String     @id @default(uuid())
+  roleName    String
+  description String?
+  updatedAt   DateTime   @default(now())
+  createdAt   DateTime   @default(now())
+  createdBy   String
+  updatedBy   String
+  employees   Employee[]
+
+  @@map(name: "role")
+}
+
+model Salary {
+  id          String   @id @default(uuid())
+  employeeId  String
+  employee    Employee @relation(fields: [employeeId], references: [id])
+  description String?
+  salary      Decimal
+  updatedAt   DateTime @default(now())
+  createdAt   DateTime @default(now())
+  createdBy   String
+  updatedBy   String
+
+  @@map(name: "salary")
+}
+
+model TotalSalary {
+  id          String    @id @default(uuid())
+  employeeId  String
+  employee    Employee  @relation(fields: [employeeId], references: [id])
+  totalSalary Decimal
+  workingTime Int
+  startAt     DateTime  @default(now())
+  endAt       DateTime?
+  updatedAt   DateTime  @default(now())
+  createdAt   DateTime  @default(now())
+  createdBy   String
+  updatedBy   String
+
+  @@map(name: "total_salary")
+}
+
+enum UserStatus {
+  Active
+  Block
+  Inactive
+}
+
+enum UserRole {
+  Admin
+  Manager
+  Employee
 }
 
 model User {
-  id           Int        @id @default(autoincrement())
-  fullName     String
-  email        String     @unique
-  provider     String     @default("Email")
-  role         Role       @relation(fields: [roleId], references: [id])
-  status       UserStatus @relation(fields: [userStatusId], references: [id])
-  password     String
-  hash         String?
-  socialId     String?
-  roleId       Int        @default(2)
-  userStatusId Int        @default(2)
+  id          String       @id @default(uuid())
+  employeeId  String       @unique
+  employee    Employee     @relation(fields: [employeeId], references: [id])
+  email       String       @unique
+  username    String
+  password    String
+  lastLogin   Int
+  avatar      String?
+  status      UserStatus
+  role        UserRole
+  updatedAt   DateTime     @default(now())
+  createdAt   DateTime     @default(now())
+  createdBy   String
+  updatedBy   String
+  notifyUsers NotifyUser[]
+
+  @@map(name: "user")
+}
+
+enum WorkingTimeStatus {
+  Pending
+  Approved
+  Blocked
+}
+
+model WorkingTime {
+  id         String            @id @default(uuid())
+  employeeId String
+  employee   Employee          @relation(fields: [employeeId], references: [id])
+  comment    String?
+  status     WorkingTimeStatus
+  startAt    DateTime          @default(now())
+  endAt      DateTime?
+
+  @@map(name: "working_time")
 }
