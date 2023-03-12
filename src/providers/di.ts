@@ -3,6 +3,7 @@ import { PrismaClient } from '@prisma/client';
 import type { AuthService } from '~/modules/auth';
 import { AuthServiceIml } from '~/modules/auth';
 import { JwtService } from '~/modules/jwt';
+import { MailService } from '~/modules/mail';
 import type { UserRepository, UserService } from '~/modules/user';
 import { UserRepositoryIml, UserServiceImpl } from '~/modules/user';
 
@@ -46,7 +47,11 @@ export class DI {
     return new PrismaClient();
   }
 
-  // -----------
+  get mailService(): MailService {
+    return new MailService(this.configService);
+  }
+
+  // *********** REPOSITORIES ***********
   get userRepository(): UserRepository {
     return new UserRepositoryIml();
   }

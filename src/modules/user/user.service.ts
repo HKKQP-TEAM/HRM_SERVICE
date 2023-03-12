@@ -7,6 +7,7 @@ import { DI } from '~/providers';
 import type { PaginationOptions } from '~/types';
 import { excludeFields } from '~/utils';
 
+import type { MailService } from '../mail';
 import type { CreateUserDto, UpdateUserDto } from './dto';
 import type { UserEntity } from './entities';
 import type { UserRepository, UserService } from './user.interface';
@@ -14,8 +15,11 @@ import type { UserRepository, UserService } from './user.interface';
 export class UserServiceImpl implements UserService {
   private userRepository: UserRepository;
 
+  private mailService: MailService;
+
   constructor() {
     this.userRepository = DI.instance.userRepository;
+    this.mailService = DI.instance.mailService;
   }
 
   create(_createProfileDto: CreateUserDto) {
@@ -47,7 +51,7 @@ export class UserServiceImpl implements UserService {
     } catch {
       throw new HttpException(StatusCodes.NOT_FOUND, [
         {
-          code: ErrorCode.NotFound,
+          code: ErrorCode.NOT_FOUND,
           key: 'User',
           message: `Not found user with ${email}`,
         },

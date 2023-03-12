@@ -1,11 +1,11 @@
+import type { UserRole } from '@prisma/client';
 import type { Action } from 'routing-controllers';
 import { UnauthorizedError } from 'routing-controllers';
 
 import type { JwtPayload } from '~/modules/jwt';
-import type { Role } from '~/modules/role';
 import { DI } from '~/providers';
 
-export function authorizationChecker(action: Action, roles: Array<Role>) {
+export function authorizationChecker(action: Action, roles: Array<UserRole>) {
   try {
     const authorization = action.request.headers.authorization;
     const token = authorization.replace(/^Bearer\s+/, '');
@@ -15,7 +15,7 @@ export function authorizationChecker(action: Action, roles: Array<Role>) {
       return true;
     }
 
-    return roles.includes(user.roleId);
+    return roles.includes(user.role);
   } catch {
     throw new UnauthorizedError();
   }
