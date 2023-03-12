@@ -68,9 +68,10 @@ enum Gender {
 
 model Employee {
   id            String        @id @default(uuid())
+  email         String        @unique
   firstName     String
   lastName      String
-  idNumber      String
+  idNumber      String?
   title         String
   job           JobTypeStatus
   gender        Gender
@@ -90,8 +91,9 @@ model Employee {
   salaries      Salary[]
   totalSalaries TotalSalary[]
   workingTime   WorkingTime[]
-  users         User[]
+  user          User?
   jobs          EmployeeJob[]
+  invitation    Invitation?
 
   @@map(name: "employee")
 }
@@ -237,7 +239,6 @@ model TotalSalary {
 enum UserStatus {
   Active
   Block
-  Inactive
 }
 
 enum UserRole {
@@ -282,4 +283,11 @@ model WorkingTime {
   endAt      DateTime?
 
   @@map(name: "working_time")
+}
+
+model Invitation {
+  id         String   @id @default(uuid())
+  role       UserRole
+  employeeId String   @unique
+  employee   Employee @relation(fields: [employeeId], references: [id])
 }

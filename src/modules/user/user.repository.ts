@@ -56,7 +56,7 @@ export class UserRepositoryIml implements UserRepository {
     return await this.prisma.user.findUnique({ where });
   }
 
-  async findOneById(id: number): Promise<UserEntity | null> {
+  async findOneById(id: string): Promise<UserEntity | null> {
     return await this.prisma.user.findUnique({ where: { id } });
   }
 
@@ -73,16 +73,18 @@ export class UserRepositoryIml implements UserRepository {
   }
 
   async update(
-    id: number,
-    entity: DeepPartial<UserEntity>,
+    id: string,
+    _entity: DeepPartial<UserEntity>,
   ): Promise<UserEntity> {
     return await this.prisma.user.update({
       where: { id },
-      data: entity,
+      data: {
+        updatedAt: new Date(),
+      },
     });
   }
 
-  async delete(id: number): Promise<UserEntity> {
+  async delete(id: string): Promise<UserEntity> {
     return await this.prisma.user.delete({ where: { id } });
   }
 }
