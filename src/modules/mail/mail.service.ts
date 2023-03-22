@@ -3,6 +3,8 @@ import { createTransport } from 'nodemailer';
 import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 
 import type { ConfigService } from '~/providers';
+
+import type { MailData } from './mail.interface';
 export class MailService {
   private transporter: Transporter<SMTPTransport.SentMessageInfo>;
 
@@ -25,6 +27,15 @@ export class MailService {
       from: `${this.configService.get<string>(
         'MAIL_DEFAULT_NAME',
       )} <${this.configService.get<string>('MAIL_DEFAULT_EMAIL')}>`,
+    });
+  }
+
+  async sendEmployeeInvitation(mailData: MailData<{ websiteUrl: string }>) {
+    await this.transporter.sendMail({
+      to: mailData.to,
+      subject: `Invitation`,
+      html: 'invitation',
+      //// need up update when implementation
     });
   }
 }
