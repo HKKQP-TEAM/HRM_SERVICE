@@ -2,6 +2,8 @@ import { PrismaClient } from '@prisma/client';
 
 import type { AuthService } from '~/modules/auth';
 import { AuthServiceIml } from '~/modules/auth';
+import type { EmployeeRepository, EmployeeService } from '~/modules/employee';
+import { EmployeeRepositoryImpl, EmployeeServiceIml } from '~/modules/employee';
 import { JwtService } from '~/modules/jwt';
 import { MailService } from '~/modules/mail';
 import type { UserRepository, UserService } from '~/modules/user';
@@ -51,8 +53,16 @@ export class DI {
     return new MailService(this.configService);
   }
 
+  get employeeService(): EmployeeService {
+    return new EmployeeServiceIml(this.employeeRepository, this.mailService);
+  }
+
   // *********** REPOSITORIES ***********
   get userRepository(): UserRepository {
     return new UserRepositoryIml();
+  }
+
+  get employeeRepository(): EmployeeRepository {
+    return new EmployeeRepositoryImpl();
   }
 }
