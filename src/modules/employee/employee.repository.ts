@@ -1,5 +1,4 @@
 import type { Prisma, PrismaClient } from '@prisma/client';
-import { Gender, JobType } from '@prisma/client';
 
 import type {
   DeepPartial,
@@ -9,6 +8,7 @@ import type {
 } from '~/core';
 import { DI } from '~/providers';
 
+import type { CreateEmployeeDto } from './dto';
 import type { EmployeeRepository } from './employee.interface';
 import type { EmployeeEntity } from './entities';
 
@@ -19,20 +19,31 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
     this.prisma = DI.instance.prismaService;
   }
 
-  async create(_entity: DeepPartial<EmployeeEntity>): Promise<EmployeeEntity> {
-    return await this.prisma.employee.create({
-      data: {
-        email: 'user@example.com',
-        firstName: 'string',
-        lastName: 'string',
-        title: 'string',
-        gender: Gender.Male,
-        job: JobType.Full,
-        roleId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        departmentId: '3fa85f64-5717-4562-b3fc-2c963f66afa6',
-        birthday: new Date().toISOString(),
+  async createWithUid(
+    uid: string,
+    data: CreateEmployeeDto,
+  ): Promise<EmployeeEntity> {
+    const { roleId: _, departmentId: __, ...restData } = data;
+
+    return this.create({
+      ...restData,
+      role: {
+        connect: {
+          id: data.roleId,
+        },
       },
+      department: {
+        connect: {
+          id: data.departmentId,
+        },
+      },
+      createdBy: uid,
+      updatedBy: uid,
     });
+  }
+
+  async create(entity: Prisma.EmployeeCreateInput): Promise<EmployeeEntity> {
+    return await this.prisma.employee.create({ data: entity });
   }
 
   async findOne(
@@ -64,7 +75,7 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
   async findOneBy(
     where: Prisma.UserWhereUniqueInput,
   ): Promise<EmployeeEntity | null> {
-    return await this.prisma.employee.findUnique({ where });
+    return await this.prisma.employee.findFirst({ where });
   }
 
   async findOneById(id: string): Promise<EmployeeEntity | null> {

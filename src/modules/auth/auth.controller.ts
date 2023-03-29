@@ -1,4 +1,3 @@
-import { IsEmail, IsNotEmpty } from 'class-validator';
 import { StatusCodes } from 'http-status-codes';
 import {
   Authorized,
@@ -6,31 +5,19 @@ import {
   Get,
   HttpCode,
   JsonController,
-  Patch,
   Post,
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 
-import { DI } from '~/providers/di';
+import { DI } from '~/providers';
 
 import type { AuthService } from './auth.interface';
-import {
-  AuthConfirmEmailDto,
-  AuthEmailLoginDto,
-  AuthForgotPasswordDto,
-  AuthResetPasswordDto,
-  AuthUpdateDto,
-} from './dto';
+import { SignInDto } from './dto';
+import type { SignInResponse } from './response';
 
-export class UserResponse {
-  public id!: string;
+// ********************************************
 
-  @IsEmail()
-  @IsNotEmpty()
-  public email!: string;
-}
-
-@JsonController('/auth/')
+@JsonController('/auth')
 @OpenAPI({ security: [{ basicAuth: [] }] })
 export class AuthController {
   authService: AuthService;
@@ -39,44 +26,16 @@ export class AuthController {
     this.authService = DI.instance.authService;
   }
 
-  @Post('login')
+  @Post('/sign-in')
   @HttpCode(StatusCodes.OK)
-  public login(@Body() loginDto: AuthEmailLoginDto) {
-    return this.authService.validateLogin(loginDto, false);
-  }
-
-  @Post('confirm')
-  @HttpCode(StatusCodes.OK)
-  confirmEmail(@Body() _confirmEmailDto: AuthConfirmEmailDto) {
-    // return this.authService.confirmEmail(confirmEmailDto.hash);
-  }
-
-  @Post('forgot/password')
-  @HttpCode(StatusCodes.OK)
-  forgotPassword(@Body() _forgotPasswordDto: AuthForgotPasswordDto) {
-    // return this.authService.forgotPassword(forgotPasswordDto.email);
-  }
-
-  @Post('reset/password')
-  @HttpCode(StatusCodes.OK)
-  resetPassword(@Body() _resetPasswordDto: AuthResetPasswordDto) {
-    // return this.authService.resetPassword(
-    //   resetPasswordDto.hash,
-    //   resetPasswordDto.password,
-    // );
+  public signIn(@Body() loginDto: SignInDto): Promise<SignInResponse> {
+    return this.authService.signIn(loginDto);
   }
 
   @Authorized()
-  @Get('me')
+  @Get('/me')
   @HttpCode(StatusCodes.OK)
   public me() {
     // return this.authService.me(request.user);
-  }
-
-  @Authorized()
-  @Patch('me')
-  @HttpCode(StatusCodes.OK)
-  public update(@Body() _userDto: AuthUpdateDto) {
-    // return this.authService.update(request.user, userDto);
   }
 }

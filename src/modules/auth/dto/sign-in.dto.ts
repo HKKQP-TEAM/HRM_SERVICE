@@ -1,16 +1,17 @@
 import { Transform } from 'class-transformer';
-import { IsEmail, IsNotEmpty } from 'class-validator';
+import { IsNotEmpty, IsString } from 'class-validator';
 
-// import { IsExist } from '~/validators/is-exists.validator';
-
-export class AuthEmailLoginDto {
+export class SignInDto {
   @Transform(({ value }) => value.toLowerCase().trim())
-  @IsEmail()
+  @IsString()
+  @IsNotEmpty()
   // @Validate(IsExist, ['User'], {
   //   message: 'Email Not Exists',
   // })
-  email: string;
+  username: string;
 
+  @IsNotEmpty()
+  @IsString()
   @IsNotEmpty()
   password: string;
 }

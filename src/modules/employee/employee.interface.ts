@@ -5,8 +5,14 @@ import type { EmployeeEntity } from './entities';
 
 export abstract class EmployeeService {
   abstract create(
+    uid: string, // createdBy, updatedBy
     createEmployeeDto: CreateEmployeeDto,
   ): Promise<EmployeeEntity>;
 }
 
-export abstract class EmployeeRepository extends BaseRepository<EmployeeEntity> {}
+export abstract class EmployeeRepository extends BaseRepository<EmployeeEntity> {
+  abstract createWithUid(
+    uid: string, // createdBy, updatedBy
+    createEmployeeDto: CreateEmployeeDto,
+  ): Promise<EmployeeEntity>;
+}

@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "mysql"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -77,10 +77,10 @@ model Employee {
   job           JobType
   gender        Gender
   birthday      DateTime
-  roleId        String?
-  role          Role?         @relation(fields: [roleId], references: [id])
-  departmentId  String?
-  department    Department?   @relation(fields: [departmentId], references: [id])
+  roleId        String
+  role          Role          @relation(fields: [roleId], references: [id])
+  departmentId  String
+  department    Department    @relation(fields: [departmentId], references: [id])
   contact       Contact[]
   updatedAt     DateTime      @default(now())
   createdAt     DateTime      @default(now())
@@ -235,11 +235,6 @@ model TotalSalary {
   @@map(name: "total_salary")
 }
 
-enum UserStatus {
-  Active
-  Block
-}
-
 enum UserRole {
   Admin
   Manager
@@ -247,21 +242,20 @@ enum UserRole {
 }
 
 model User {
-  id          String       @id @default(uuid())
-  employeeId  String       @unique
-  employee    Employee     @relation(fields: [employeeId], references: [id])
-  email       String       @unique
-  username    String
-  password    String
-  lastLogin   Int
-  avatar      String?
-  status      UserStatus
-  role        UserRole
-  updatedAt   DateTime     @default(now())
-  createdAt   DateTime     @default(now())
-  createdBy   String
-  updatedBy   String
-  notifyUsers NotifyUser[]
+  id              String       @id @default(uuid())
+  employeeId      String?      @unique
+  employee        Employee?    @relation(fields: [employeeId], references: [id])
+  email           String       @unique
+  username        String       @unique
+  password        String
+  lastActivity    DateTime     @default(now())
+  avatar          String?
+  emailVerifiedAt DateTime?
+  disabledAt      DateTime?
+  role            UserRole
+  updatedAt       DateTime     @default(now())
+  createdAt       DateTime     @default(now())
+  notifyUsers     NotifyUser[]
 
   @@map(name: "user")
 }

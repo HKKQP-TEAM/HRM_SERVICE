@@ -1,14 +1,9 @@
-import type { UserEntity } from '../user/entities';
-import type { AuthEmailLoginDto } from './dto';
+import type { UserEntity } from '../user';
+import type { SignInDto } from './dto';
+import type { SignInResponse } from './response';
 
-export interface AuthService {
-  validateLogin(
-    loginDto: AuthEmailLoginDto,
-    onlyAdmin: boolean,
-  ): Promise<{
-    token: string;
-    user: Omit<UserEntity, keyof UserEntity>;
-  }>;
+export abstract class AuthService {
+  abstract signIn(body: SignInDto): Promise<SignInResponse>;
 
-  // register(dto: AuthRegisterDto): Promise<UserEntity>;
+  abstract me(uid: string): Promise<Omit<UserEntity, keyof UserEntity>>;
 }

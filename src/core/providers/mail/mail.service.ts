@@ -2,7 +2,7 @@ import type { Transporter } from 'nodemailer';
 import { createTransport } from 'nodemailer';
 import type SMTPTransport from 'nodemailer/lib/smtp-transport';
 
-import type { ConfigService } from '~/providers';
+import type { ConfigService } from '~/core/providers';
 
 import type { MailData } from './mail.interface';
 export class MailService {

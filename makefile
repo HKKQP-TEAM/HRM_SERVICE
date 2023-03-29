@@ -17,3 +17,7 @@ re-generate:
 	make drop-db
 	make generate
 	make push-db
+
+re-generate-seed:
+	make re-generate
+	make seed

@@ -2,10 +2,10 @@ import type { Application } from 'express';
 import express from 'express';
 import { useExpressServer } from 'routing-controllers';
 
-import { authorizationChecker } from './middleware';
-import type { ConfigService } from './providers';
+import { authorizationChecker, currentUserChecker, logger } from '~/core';
+
+import type { ConfigService } from './core/providers';
 import { Swagger } from './swagger';
-import { logger } from './utils';
 
 export class App {
   private app: Application;
@@ -36,6 +36,7 @@ export class App {
       classTransformer: true,
       controllers: [__dirname + '/modules/**/*.controller.{ts,js}'],
       authorizationChecker,
+      currentUserChecker,
     });
   }
 
