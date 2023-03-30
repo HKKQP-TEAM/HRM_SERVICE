@@ -1,9 +1,6 @@
-import { StatusCodes } from 'http-status-codes';
+import { BadRequestException } from '~/core/exceptions';
 
-import { ErrorCode } from '~/enums';
-import { HttpException } from '~/exceptions';
-
-import type { MailService } from '../mail';
+import type { MailService } from '../../core/providers/mail';
 import type { CreateEmployeeDto } from './dto';
 import type { EmployeeRepository, EmployeeService } from './employee.interface';
 import type { EmployeeEntity } from './entities';
@@ -14,20 +11,16 @@ export class EmployeeServiceIml implements EmployeeService {
     private readonly mailService: MailService,
   ) {}
 
-  async create(createEmployeeDto: CreateEmployeeDto): Promise<EmployeeEntity> {
+  async create(
+    uid: string,
+    createEmployeeDto: CreateEmployeeDto,
+  ): Promise<EmployeeEntity> {
     const employee = await this.employeeRepository.findOneBy({
       email: createEmployeeDto.email,
     });
 
-    if (employee) {
-      throw new HttpException(StatusCodes.CONFLICT, [
-        {
-          code: ErrorCode.ALREADY_EXISTED,
-          key: 'Employee',
-          message: 'Employee already existed!!!',
-        },
-      ]);
-    }
+    if (employee)
+      throw new BadRequestException('Employee', 'Employee already existed!!!');
 
     // send mail
     void this.mailService
@@ -38,6 +31,6 @@ export class EmployeeServiceIml implements EmployeeService {
       .then()
       .catch();
 
-    return this.employeeRepository.create(createEmployeeDto);
+    return this.employeeRepository.createWithUid(uid, createEmployeeDto);
   }
 }

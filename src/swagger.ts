@@ -6,7 +6,7 @@ import { getMetadataArgsStorage } from 'routing-controllers';
 import { routingControllersToSpec } from 'routing-controllers-openapi';
 import * as swaggerUi from 'swagger-ui-express';
 
-import type { ConfigService } from './providers';
+import type { ConfigService } from './core/providers';
 
 export class Swagger {
   constructor(private app: Application, private configService: ConfigService) {}

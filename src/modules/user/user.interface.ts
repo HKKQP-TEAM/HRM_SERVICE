@@ -1,23 +1,26 @@
-import { BaseRepository } from '~/core';
-import type { PaginationOptions } from '~/types';
+import type { Prisma } from '@prisma/client';
 
-import type { CreateUserDto, UpdateUserDto } from './dto';
+import type { DeepPartial } from '~/core';
+
+import type { CreateUserDto } from './dto';
 import type { UserEntity } from './entities';
 
-export interface UserService {
-  create(createProfileDto: CreateUserDto): Promise<UserEntity>;
+export abstract class UserService {
+  abstract create(createProfileDto: CreateUserDto): Promise<UserEntity>;
 
-  findManyWithPagination(
-    paginationOptions: PaginationOptions,
-  ): Promise<Array<UserEntity>>;
+  abstract findById(id: string): Promise<Omit<UserEntity, keyof UserEntity>>;
 
-  findById(id: string): Promise<Omit<UserEntity, keyof UserEntity>>;
+  abstract findByEmail(email: string): Promise<UserEntity>;
 
-  findByEmail(email: string): Promise<UserEntity | null>;
-
-  update(id: string, updateProfileDto: UpdateUserDto);
-
-  delete(id: string): Promise<void>;
+  abstract findByUsername(username: string): Promise<UserEntity>;
 }
 
-export abstract class UserRepository extends BaseRepository<UserEntity> {}
+export abstract class UserRepository {
+  abstract create(entity: DeepPartial<UserEntity>): Promise<UserEntity>;
+
+  abstract findUniqueBy(
+    where: Prisma.UserWhereUniqueInput,
+  ): Promise<UserEntity | null>;
+
+  abstract findById(id: string): Promise<UserEntity | null>;
+}

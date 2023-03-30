@@ -1,15 +1,15 @@
 import { PrismaClient } from '@prisma/client';
 
+import { ConfigService, JwtService } from '~/core';
+import { MailService } from '~/core/providers/mail';
 import type { AuthService } from '~/modules/auth';
 import { AuthServiceIml } from '~/modules/auth';
 import type { EmployeeRepository, EmployeeService } from '~/modules/employee';
 import { EmployeeRepositoryImpl, EmployeeServiceIml } from '~/modules/employee';
-import { JwtService } from '~/modules/jwt';
-import { MailService } from '~/modules/mail';
 import type { UserRepository, UserService } from '~/modules/user';
 import { UserRepositoryIml, UserServiceImpl } from '~/modules/user';
 
-import { ConfigService } from './config.service';
+// ********************************************
 
 export class DI {
   private static singleton: DI;
@@ -42,7 +42,7 @@ export class DI {
   }
 
   get authService(): AuthService {
-    return new AuthServiceIml(this.userService);
+    return new AuthServiceIml(this.userService, this.jwtService);
   }
 
   get prismaService(): PrismaClient {
