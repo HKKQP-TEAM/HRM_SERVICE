@@ -64,6 +64,18 @@ export class EmployeeRepositoryImpl implements EmployeeRepository {
     });
   }
 
+  async findWithRelational(
+    options?: FindManyOptions<EmployeeEntity>,
+    include?: Prisma.EmployeeInclude,
+  ): Promise<Array<EmployeeEntity>> {
+    return await this.prisma.employee.findMany({
+      skip: options?.skip,
+      take: options?.take,
+      where: <Prisma.EmployeeWhereInput>options?.where,
+      include,
+    });
+  }
+
   async findBy(
     options: FindOptionsWhere<EmployeeEntity>,
   ): Promise<Array<EmployeeEntity>> {

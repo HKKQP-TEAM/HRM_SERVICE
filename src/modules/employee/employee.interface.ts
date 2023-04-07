@@ -1,3 +1,6 @@
+import type { Prisma } from '@prisma/client';
+
+import type { FindManyOptions, PaginationOptions } from '~/core';
 import { BaseRepository } from '~/core';
 
 import type { CreateEmployeeDto } from './dto';
@@ -8,6 +11,11 @@ export abstract class EmployeeService {
     uid: string, // createdBy, updatedBy
     createEmployeeDto: CreateEmployeeDto,
   ): Promise<EmployeeEntity>;
+
+  abstract getListWithPagination(
+    paginationOptions: PaginationOptions,
+    query?: string,
+  );
 }
 
 export abstract class EmployeeRepository extends BaseRepository<EmployeeEntity> {
@@ -15,4 +23,9 @@ export abstract class EmployeeRepository extends BaseRepository<EmployeeEntity> 
     uid: string, // createdBy, updatedBy
     createEmployeeDto: CreateEmployeeDto,
   ): Promise<EmployeeEntity>;
+
+  abstract findWithRelational(
+    options?: FindManyOptions<EmployeeEntity>,
+    include?: Prisma.EmployeeInclude,
+  ): Promise<Array<EmployeeEntity>>;
 }

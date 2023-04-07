@@ -1,9 +1,32 @@
-import type { PaginationOptions } from '~/core';
+import type { Pagination, PaginationOptions } from '~/core';
 
 export const infinityPagination = <T>(
-  data: Array<T>,
-  options: PaginationOptions,
+  list: Array<T>,
+  pagination: Pagination,
+  total: number,
 ) => ({
-  data,
-  hasNextPage: data.length === options.limit,
+  list,
+  pagination: {
+    total,
+    limit: pagination.limit,
+    currentPage: pagination.currentPage,
+    lastPage: Math.ceil(total / pagination.limit),
+  },
 });
+
+export const parsePagination = (
+  options: PaginationOptions,
+  maxLimit = 50,
+): Pagination => {
+  let limit = options.limit || 10;
+  if (limit <= 0 || limit > maxLimit) limit = maxLimit;
+  let currentPage: number = options.page;
+  if (currentPage <= 0) currentPage = 1;
+
+  return {
+    limit,
+    total: 0,
+    currentPage,
+    lastPage: 0,
+  };
+};
