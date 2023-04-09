@@ -29,13 +29,16 @@ export class EmployeeServiceIml implements EmployeeService {
     // send mail
     void this.mailService
       .sendEmployeeInvitation({
-        to: 'axnguyen.it@gmail.com',
-        data: { websiteUrl: 'string' },
+        to: createEmployeeDto.email,
+        data: { websiteUrl: 'string' }, //// will be updated
       })
       .then()
       .catch();
 
-    return this.employeeRepository.createWithUid(uid, createEmployeeDto);
+    return this.employeeRepository.createWithUid(uid, {
+      ...createEmployeeDto,
+      birthday: new Date(createEmployeeDto.birthday),
+    });
   }
 
   async getListWithPagination(

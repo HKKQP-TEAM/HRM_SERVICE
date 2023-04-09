@@ -2,6 +2,7 @@ import { StatusCodes } from 'http-status-codes';
 import {
   Authorized,
   Body,
+  CurrentUser,
   Get,
   HttpCode,
   JsonController,
@@ -9,6 +10,7 @@ import {
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 
+import { JwtPayload } from '~/core';
 import { DI } from '~/providers';
 
 import type { AuthService } from './auth.interface';
@@ -35,7 +37,7 @@ export class AuthController {
   @Authorized()
   @Get('/me')
   @HttpCode(StatusCodes.OK)
-  public me() {
-    // return this.authService.me(request.user);
+  public me(@CurrentUser() decodedData: JwtPayload) {
+    return this.authService.me(decodedData.uid);
   }
 }
