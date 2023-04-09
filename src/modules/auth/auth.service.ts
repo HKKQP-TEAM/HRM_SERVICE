@@ -1,5 +1,5 @@
 import type { JwtService } from '~/core';
-import { BcryptHelper } from '~/core';
+import { BcryptHelper, excludeFields } from '~/core';
 import { BadRequestException, NotFoundException } from '~/core/exceptions';
 import type { UserEntity, UserService } from '~/modules/user';
 
@@ -23,14 +23,20 @@ export class AuthServiceIml implements AuthService {
     );
 
     if (!isValidPassword)
-      throw new NotFoundException('User', 'Invalid password');
+      throw new BadRequestException('User', 'Invalid password');
 
     if (!user.emailVerifiedAt)
+      throw new BadRequestException('User', 'User is deactivated');
+
+    if (user.disabledAt)
       throw new BadRequestException('User', 'User is disabled');
 
     const accessToken = this.jwtService.sign({ uid: user.id, role: user.role });
 
-    return { accessToken, user };
+    return {
+      accessToken,
+      user: excludeFields<UserEntity, keyof UserEntity>(user, ['password']),
+    };
   }
 
   async me(uid: string): Promise<Omit<UserEntity, keyof UserEntity>> {

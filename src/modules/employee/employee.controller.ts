@@ -4,9 +4,11 @@ import {
   Authorized,
   Body,
   CurrentUser,
+  Get,
   HttpCode,
   JsonController,
   Post,
+  QueryParam,
 } from 'routing-controllers';
 import { OpenAPI } from 'routing-controllers-openapi';
 
@@ -40,5 +42,15 @@ export class EmployeeController {
     createEmployee: CreateEmployeeDto,
   ) {
     return this.employeeService.create(decodedJwt.uid, createEmployee);
+  }
+
+  @Get()
+  @HttpCode(StatusCodes.OK)
+  getEmployees(
+    @QueryParam('page', { required: true }) page: number,
+    @QueryParam('limit', { required: true }) limit: number,
+    @QueryParam('query') query: string,
+  ) {
+    return this.employeeService.getListWithPagination({ page, limit }, query);
   }
 }
